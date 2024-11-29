@@ -24,7 +24,7 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Logout Button */}
+        {/* Login Button */}
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-all"
           onClick={() => {
@@ -32,7 +32,7 @@ const Navbar = () => {
             window.location.href = "/auth/login";
           }}
         >
-          Logout
+          Login
         </button>
       </div>
     </header>

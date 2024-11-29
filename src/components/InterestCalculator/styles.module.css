@@ -4,6 +4,8 @@
   z-index: 50;
   background-color: #fafafa;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
 .navbar a {
@@ -65,9 +67,10 @@
 
 .input {
   flex: 2;
-  padding: 8px;
+  padding: 3px 1.5px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  outline: none;
 }
 
 .calculateButton {

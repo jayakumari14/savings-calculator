@@ -44,30 +44,39 @@ const SavingsInterest = () => {
     const doc = new jsPDF();
 
     if (componentRef.current) {
-      doc.html(componentRef.current, {
+      // Ensure `componentRef` is properly typed as HTMLDivElement
+      const chartContainer = componentRef.current as HTMLDivElement;
+
+      const chartCanvas = chartContainer.querySelector("canvas");
+      if (chartCanvas) {
+        const context = chartCanvas.getContext("2d");
+        if (context) {
+          // Save the original state
+          context.save();
+
+          // Set white background
+          context.globalCompositeOperation = "destination-over"; // Ensures background is drawn first
+          context.fillStyle = "white";
+          context.fillRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+          // Restore the original state
+          context.restore();
+        }
+      }
+
+      // Render HTML to PDF
+      doc.html(chartContainer, {
         callback: function (doc) {
-          // Ensure that the content doesn't break the page.
-          const pageHeight = doc.internal.pageSize.height;
-          let currentHeight = 0;
-
-          doc.setFontSize(12);
-          doc.text("Savings Interest Calculator", 20, (currentHeight += 10));
-          // Ensure pie chart does not overflow into text.
-          currentHeight += 40;
-          if (currentHeight > pageHeight) {
-            doc.addPage(); // Add a new page if it overflows.
-            currentHeight = 20;
-          }
-
           doc.save("SavingsInterest.pdf");
         },
-
-        margin: [20, 20, 20, 20], // Adjust the margins to give enough space
+        margin: [20, 20, 20, 20],
         x: 10,
         y: 10,
-        width: 180, // Set width to prevent overflow
-        windowWidth: 1000, // This might need tuning for large components
+        width: 180,
+        windowWidth: 1000,
       });
+    } else {
+      console.error("Component reference is null.");
     }
   };
 
@@ -77,13 +86,20 @@ const SavingsInterest = () => {
       {
         data: [principal, result || 0],
         backgroundColor: ["#3B82F6", "#69AFFF"],
+        hoverBackgroundColor: ["#2563EB", "#3B82F6"], // Optional for hover effect
       },
     ],
   };
 
+  const options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: "50%", // Transforms the pie chart into a donut chart
+  };
+
   return (
     <div ref={componentRef} className={styles.calculatorContainer}>
-      <h2 className={styles.heading}>Savings Interest Calculator</h2>
+      <h2 className={styles.heading}>Simple Interest Calculator</h2>
 
       <div className={styles.inputSection}>
         <label className={styles.label}>Principal Amount:</label>
@@ -126,7 +142,7 @@ const SavingsInterest = () => {
         <div className={styles.resultBox}>
           <h3>Total Interest: ₹{result}</h3>
           <button className={styles.downloadButton} onClick={downloadPDF}>
-            Download UI as PDF
+            Download as PDF
           </button>
         </div>
       )}
@@ -134,10 +150,7 @@ const SavingsInterest = () => {
       {result !== null && (
         <div className={styles.chartContainer}>
           <h3>Interest Breakdown</h3>
-          <Pie
-            data={data}
-            options={{ responsive: true, maintainAspectRatio: true }}
-          />
+          <Pie data={data} options={options} />
         </div>
       )}
     </div>
